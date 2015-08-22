@@ -1,0 +1,44 @@
+﻿@model DotNetCanvasStarterKit.Models.Canvas.IndexViewModel
+
+@{
+    ViewBag.Title = "View";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section scripts {
+<script type="text/javascript" src="~/Scripts/canvas-all.js"></script>
+<script type="text/javascript">
+    Sfdc.canvas(function () {
+        if (!Sfdc.canvas.oauth.loggedin()) {
+            var uri = Sfdc.canvas.oauth.loginUrl();
+            Sfdc.canvas.oauth.login({
+                uri: uri,
+                params: {
+                    response_type: "token",
+                    client_id: "@Model.ClientId",
+                    redirect_uri: encodeURIComponent("@Model.RedirectUrl")
+                }
+            });
+
+            if (Sfdc.canvas.oauth.checkChildWindowBlocked()) {
+                alert('Oops! It looks like your browser has blocked the OAuth popup. Please allow popups for this site and refresh the page.');
+            }
+            else {
+                // wait for auth window to close
+                setInterval(function () {
+                    if (Sfdc.canvas.oauth.checkChildWindowStatus()) {
+                        Sfdc.canvas.client.repost(true);
+                    }
+                }, 500);
+            }
+        }
+        else {
+            Sfdc.canvas.client.repost(true);
+        }
+    });
+</script>
+}
+
+<h3>Access grant required.</h3>
+
+<p>We are attempting to log you in. You should see a popup asking for permission to access your organization. If you do not, please check your browser's popup settings and allow popups for this site, then refresh this page.</p>
